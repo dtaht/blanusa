@@ -4,8 +4,14 @@ ASM= $(patsubst %.test,%.s,$(TARGETS))
 all: $(TARGETS)
 
 asm: $(ASM)
-	
+
+test: $(TARGETS)
+	@echo $(foreach t,$(TARGETS),$(shell ./$(t) | head -1))
+
 COPTS+=-std=gnu99 -lrt
+#ifeq($DEBUG,,)
+COPTS+=-g
+#endif
 
 $(CC)-blanusa-noopt.test: blanusa_1.c
 	$(CC) $(COPTS) -O0 $^ -lm -o $@

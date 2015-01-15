@@ -5,13 +5,13 @@
 #include <time.h>
 
 #ifndef CLOCK_PROCESS_CPUTIME_ID
-// std=c99 doesn't have clock_gettime
-#error where the heck is clock_gettime
+// std=c99 doesn't have clock_gettime for some reason
+#error where the heck is clock_gettime?
 #endif
 
-#define MAXB 100000
-//#define DEF_TIMER CLOCK_PROCESS_CPUTIME_ID
-#define DEF_TIMER CLOCK_REALTIME
+#define MAXB 10000
+#define DEF_TIMER CLOCK_PROCESS_CPUTIME_ID
+//#define DEF_TIMER CLOCK_REALTIME
 
 /* calculate a blanusa snark 
 
@@ -47,15 +47,14 @@ double blanusa_unrolled(double x) {
 
 
 
-void timespec_diff(struct timespec *r, struct timespec *start, struct timespec *end)
+void timespec_diff(struct timespec *temp, struct timespec *start, struct timespec *end)
 {
-	struct timespec temp;
 	if ((end->tv_nsec-start->tv_nsec)<0) {
-		temp.tv_sec = end->tv_sec-start->tv_sec-1;
-		temp.tv_nsec = 1000000000+end->tv_nsec-start->tv_nsec;
+		temp->tv_sec = end->tv_sec-start->tv_sec-1;
+		temp->tv_nsec = 1000000000 + end->tv_nsec-start->tv_nsec;
 	} else {
-		temp.tv_sec = end->tv_sec-start->tv_sec;
-		temp.tv_nsec = end->tv_nsec-start->tv_nsec;
+		temp->tv_sec = end->tv_sec-start->tv_sec;
+		temp->tv_nsec = end->tv_nsec-start->tv_nsec;
 	}
 }
 
@@ -82,7 +81,8 @@ int main(int argc, char **argv) {
 	}
 
 	timespec_diff(&dur,&start,&end);
-	printf("Duration: %ld.%ld\n", dur.tv_sec, dur.tv_nsec);
+	printf("i: %g Duration: %ld.%09ld\n", results[40],
+			   dur.tv_sec, dur.tv_nsec);
 	for (int i = 0; i < MAXB; i++) {
 		printf("%g\n", results[i]);
 	}
