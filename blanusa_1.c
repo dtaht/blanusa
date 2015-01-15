@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
 	}
 
 	timespec_diff(&dur,&start,&end);
-	printf("i: %g Duration: %ld.%09ld\n", results[40],
+	printf("Duration: %ld.%09ld\n",
 			   dur.tv_sec, dur.tv_nsec);
 	for (int i = 0; i < MAXB; i++) {
 		printf("%g\n", results[i]);
