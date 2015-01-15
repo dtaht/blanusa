@@ -9,9 +9,9 @@ test: $(TARGETS)
 	@echo $(foreach t,$(TARGETS),$(shell ./$(t) | head -1))
 
 COPTS+=-std=gnu99 -lrt
-#ifeq($DEBUG,,)
+ifdef DEBUG
 COPTS+=-g
-#endif
+endif
 
 $(CC)-blanusa-noopt.test: blanusa_1.c
 	$(CC) $(COPTS) -O0 $^ -lm -o $@
