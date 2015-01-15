@@ -1,17 +1,19 @@
-TARGETS=$(CC)-blanusa-noopt $(CC)-blanusa-opt3 $(CC)-blanusa-fastmath
+TARGETS=$(CC)-blanusa-noopt.test $(CC)-blanusa-opt3.test $(CC)-blanusa-fastmath.test
+ASM= $(patsubst %.test,%.s,$(TARGETS))
 
 all: $(TARGETS)
-#asm: $(patsubst ,.asm,$TARGETS)
 
+asm: $(ASM)
+	
 COPTS+=-std=gnu99 -lrt
 
-$(CC)-blanusa-noopt: blanusa_1.c
+$(CC)-blanusa-noopt.test: blanusa_1.c
 	$(CC) $(COPTS) -O0 $^ -lm -o $@
 
-$(CC)-blanusa-opt3: blanusa_1.c
+$(CC)-blanusa-opt3.test: blanusa_1.c
 	$(CC) $(COPTS) -O3 $^ -lm -o $@
 
-$(CC)-blanusa-fastmath: blanusa_1.c
+$(CC)-blanusa-fastmath.test: blanusa_1.c
 	$(CC) $(COPTS) -O3 -ffast-math $^ -lm -o $@
 
 $(CC)-blanusa-noopt.s: blanusa_1.c
@@ -24,4 +26,5 @@ $(CC)-blanusa-fastmath.s: blanusa_1.c
 	$(CC) $(COPTS) -O3 -ffast-math $^ -S -lm -o $@
 
 clean:
-	rm -f $(TARGETS)
+	rm -f $(TARGETS) $(ASM)
+	
