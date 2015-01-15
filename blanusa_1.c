@@ -1,5 +1,17 @@
 #include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
 #include <math.h>
+#include <time.h>
+
+#ifndef CLOCK_PROCESS_CPUTIME_ID
+// std=c99 doesn't have clock_gettime
+#error where the heck is clock_gettime
+#endif
+
+#define MAXB 100000
+//#define DEF_TIMER CLOCK_PROCESS_CPUTIME_ID
+#define DEF_TIMER CLOCK_REALTIME
 
 /* calculate a blanusa snark 
 
@@ -33,13 +45,44 @@ double blanusa_unrolled(double x) {
 }
 */
 
-#define MAXB 10000
+
+
+void timespec_diff(struct timespec *r, struct timespec *start, struct timespec *end)
+{
+	struct timespec temp;
+	if ((end->tv_nsec-start->tv_nsec)<0) {
+		temp.tv_sec = end->tv_sec-start->tv_sec-1;
+		temp.tv_nsec = 1000000000+end->tv_nsec-start->tv_nsec;
+	} else {
+		temp.tv_sec = end->tv_sec-start->tv_sec;
+		temp.tv_nsec = end->tv_nsec-start->tv_nsec;
+	}
+}
+
+/* A sufficiently smart compiler would replace all this with a single
+   call to printf, doing all the calculations at compile time. That
+   doesn't seem to happen... */
 
 int main(int argc, char **argv) {
 	double results[MAXB];
+	struct timespec end;
+	struct timespec start;
+	struct timespec dur;
+	if(clock_gettime(DEF_TIMER,&start) == -1) {
+		perror("Bad clock");
+		exit(-1);
+	}
 	for (int i = 0; i < MAXB; i++) {
 		results[i] = blanusa_pow(i);
 	}
+
+	if(clock_gettime(DEF_TIMER,&end) == -1) {
+		perror("Bad clock");
+		exit(-1);
+	}
+
+	timespec_diff(&dur,&start,&end);
+	printf("Duration: %ld.%ld\n", dur.tv_sec, dur.tv_nsec);
 	for (int i = 0; i < MAXB; i++) {
 		printf("%g\n", results[i]);
 	}
