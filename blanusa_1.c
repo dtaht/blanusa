@@ -9,7 +9,7 @@
 #error where the heck is clock_gettime?
 #endif
 
-#define MAXB 10000
+#define MAXB 1000000
 #define DEF_TIMER CLOCK_PROCESS_CPUTIME_ID
 //#define DEF_TIMER CLOCK_REALTIME
 

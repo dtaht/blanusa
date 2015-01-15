@@ -7,6 +7,15 @@ asm: $(ASM)
 
 test: $(TARGETS)
 	@echo $(foreach t,$(TARGETS),$(shell ./$(t) | head -1))
+	@echo $(foreach t,$(TARGETS),$(shell ./$(t) | head -1))
+	@echo $(foreach t,$(TARGETS),$(shell ./$(t) | head -1))
+	@echo $(foreach t,$(TARGETS),$(shell ./$(t) | head -1))
+	@echo $(foreach t,$(TARGETS),$(shell ./$(t) | head -1))
+	@echo $(foreach t,$(TARGETS),$(shell ./$(t) | head -1))
+	@echo $(foreach t,$(TARGETS),$(shell ./$(t) | head -1))
+	@echo $(foreach t,$(TARGETS),$(shell ./$(t) | head -1))
+	@echo $(foreach t,$(TARGETS),$(shell ./$(t) | head -1))
+	@echo $(foreach t,$(TARGETS),$(shell ./$(t) | head -1))
 
 COPTS+=-std=gnu99 -lrt
 ifdef DEBUG
