@@ -13,10 +13,13 @@
 #define DEF_TIMER CLOCK_PROCESS_CPUTIME_ID
 //#define DEF_TIMER CLOCK_REALTIME
 
-/* calculate a blanusa snark 
+/* calculate the first blanusa snark 
 
 		   (x-3)(x-1)^3
 		   (x+1)(x+2)(x^4+x^3-7x^2-5x+6)(x^4+x^3-5x^2-3x+4)^2
+
+   calculate the second blanusa snark
+
     		   (x-3)(x-1)^3(x^3+2x^2-3x-5)
 		   (x^3+2x^2-x-1)(x^4+x^3-7x^2-6x+7)(x^4+x^3-5x^2-4x+3);
 
@@ -26,20 +29,31 @@
 /* compiled without -ffast-math, this inserts tons of calls to pow.
    with fast-math, it looks like it does the right thing with CSE */
 
-double blanusa_pow(double x) {
-  double r = (x-3)*pow(x-1,3) *
+double blanusa1_pow(double x) {
+  return (x-3)*pow(x-1,3) *
     (x+1)*(x+2)*
     (pow(x,4)+pow(x,3)-7*pow(x,2)-5*x+6)*
-    pow((pow(x,4)+pow(x,3) - 5 * pow(x,2)-3*x+4),2) *
-    (x-3)*pow(x-1,3)*(pow(x,3)+2*pow(x,2)-3*x-5) *
+    pow((pow(x,4)+pow(x,3) - 5 * pow(x,2)-3*x+4),2);
+}
+
+/*    calculate the second blanusa snark
+
+    		   (x-3)(x-1)³(x^3+2x^2-3x-5)
+		   (x^3+2x^2-x-1)(x^4+x^3-7x^2-6x+7)(x^4+x^3-5x^2-4x+3);
+
+*/
+
+double blanusa2_pow(double x) {
+    return (x-3)*pow(x-1,3)*(pow(x,3)+2*pow(x,2)-3*x-5) *
     (pow(x,3)+2*pow(x,2)-x-1) *
     (pow(x,4) + pow(x,3)- 7* pow(x,2)-6*x+7)*
     (pow(x,4) + pow(x,3)- 5* pow(x,2)-4*x+3);
-  return r;
 }
 
 /* Wolfram alpha translated this into something different - as did my emacs,
-   when entered into a comment:
+   when entered into a comment. I had (in error) combined the first
+and second blanusa snarks, which wolfram optimized for a cleaner
+equation (which did, indeed, run faster than the original code did!)
 
 (x-3)²(x-1)⁶(x+1)(x+2)(x³+2x²-3x-5)(x³+2x²-x-1)(x⁴+x³-7x²-6x+7)
 (x⁴+x³-7x²-5x+6)(x⁴+x³-5x²-4x+3)(x⁴+x³+5x²-3x+4)²
@@ -74,6 +88,8 @@ void timespec_diff(struct timespec *temp, struct timespec *start, struct timespe
 double results[MAXB];
 double results2[MAXB];
 
+#define START 0
+
 /* A sufficiently smart compiler would replace all this with a single
    call to printf, doing all the calculations at compile time. That
    doesn't seem to happen... */
@@ -89,8 +105,8 @@ int main(int argc, char **argv) {
 		exit(-1);
 	}
 
-	for (int i = 8; i < MAXB; i++) {
-		results[i] = blanusa_pow(i);
+	for (int i = START; i < MAXB; i++) {
+		results[i] = blanusa1_pow(i);
 	}
 
 	if(clock_gettime(DEF_TIMER,&end) == -1) {
@@ -109,8 +125,8 @@ int main(int argc, char **argv) {
 		perror("Bad clock");
 		exit(-1);
 	}
-	for (int i = 8; i < MAXB; i++) {
-		results2[i] = blanusa_wolfram(i);
+	for (int i = START; i < MAXB; i++) {
+		results2[i] = blanusa2_pow(i);
 	}
 
 	if(clock_gettime(DEF_TIMER,&end) == -1) {
@@ -121,9 +137,10 @@ int main(int argc, char **argv) {
 	timespec_diff(&dur,&start,&end);
 	printf("Duration: %ld.%09ld\n",
 			   dur.tv_sec, dur.tv_nsec);
-	for (int i = 8; i < MAXB; i++) {
-	  printf("%s %g %g\n", results[i] == results2[i] ? "GOOD" : "BAD ",
-		 results[i], results2[i]);
+	for (int i = START; i < MAXB; i++) {
+	  	  printf("%g\n", results[i]);
+	  //	  printf("DIFF: %g %g %g\n", results[i]-results2[i],
+	  // results[i], results2[i]);
 	}
 }
 
